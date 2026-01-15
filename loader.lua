@@ -1,4 +1,4 @@
--- loader.lua (CelestialUI - CLEAN & FIXED)
+-- loader.lua (CelestialUI - STABLE FIX)
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -8,7 +8,7 @@ local LocalPlayer = Players.LocalPlayer
 local API_BASE = "https://loquacious-tyrell-ferociously.ngrok-free.dev"
 -- ==================
 
--- HWID (stable & Roblox-safe)
+-- HWID
 local function getHWID()
     return tostring(LocalPlayer.UserId)
 end
@@ -34,7 +34,7 @@ local function fetchScript(key)
     return game:HttpGet(url)
 end
 
--- ===== LOAD UI LIBRARY SAFELY =====
+-- ===== LOAD UI =====
 local Library
 do
     local ok, lib = pcall(function()
@@ -44,7 +44,7 @@ do
     end)
 
     if not ok or not lib then
-        warn("[Celestial Loader] Failed to load UI library")
+        warn("[Celestial Loader] UI failed to load")
         return
     end
 
@@ -61,34 +61,32 @@ local tab = ui:create_tab(
 
 local module = tab:create_module({
     title = "Celestial Loader",
-    description = "Paste your key below and click Verify & Load",
+    description = "Paste your key below",
     section = "left",
     callback = function() end
 })
 
 local enteredKey = ""
 
--- 🔑 KEY INPUT (FIXED)
 module:create_textbox({
     title = "Key",
+    description = "Your access key",
     placeholder = "BB-XXXXXXX",
     callback = function(v)
         if type(v) ~= "string" then
             enteredKey = ""
             return
         end
-
-        v = v:gsub("%s+", "") -- trim spaces
-        enteredKey = v
+        enteredKey = v:gsub("%s+", "")
     end
 })
 
--- ▶ VERIFY BUTTON
 module:create_button({
     title = "Verify & Load",
+    description = "Verify your key and load the script",
     callback = function()
-        if not enteredKey or enteredKey == "" or enteredKey == "None" then
-            warn("[Celestial Loader] Please enter a valid key")
+        if enteredKey == "" or enteredKey == "None" then
+            warn("[Celestial Loader] Invalid key")
             return
         end
 
@@ -106,7 +104,6 @@ module:create_button({
             return
         end
 
-        -- Fetch & execute private script
         local code = fetchScript(enteredKey)
         loadstring(code)()
     end
