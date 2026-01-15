@@ -1,4 +1,4 @@
--- loader.lua (CelestialUI - FIXED)
+-- loader.lua (CelestialUI - CLEAN & FIXED)
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -54,42 +54,41 @@ end
 -- ===== UI =====
 local ui = Library.new()
 
--- ⚠️ ICON MUST NOT BE EMPTY
 local tab = ui:create_tab(
     "Loader",
-    "rbxassetid://10723346959" -- valid icon ID (anything non-empty works)
+    "rbxassetid://10723346959"
 )
 
 local module = tab:create_module({
     title = "Celestial Loader",
-    description = "Enter your key to load the script",
+    description = "Paste your key below and click Verify & Load",
     section = "left",
     callback = function() end
 })
 
 local enteredKey = ""
 
+-- 🔑 KEY INPUT (FIXED)
 module:create_textbox({
     title = "Key",
     placeholder = "BB-XXXXXXX",
     callback = function(v)
+        if type(v) ~= "string" then
+            enteredKey = ""
+            return
+        end
+
+        v = v:gsub("%s+", "") -- trim spaces
         enteredKey = v
     end
 })
 
-module:create_dropdown({
-    title = "Preset",
-    options = { "Balanced", "Low Ping", "High Ping", "Aggressive" },
-    callback = function(v)
-        getgenv().BB_PRESET = v
-    end
-})
-
+-- ▶ VERIFY BUTTON
 module:create_button({
     title = "Verify & Load",
     callback = function()
-        if not enteredKey or enteredKey == "" then
-            warn("[Celestial Loader] No key entered")
+        if not enteredKey or enteredKey == "" or enteredKey == "None" then
+            warn("[Celestial Loader] Please enter a valid key")
             return
         end
 
