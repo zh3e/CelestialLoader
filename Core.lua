@@ -20,6 +20,28 @@ local function SaveConfig()
     writefile(CONFIG_FILE, HttpService:JSONEncode(Config))
 end
 
+local function ImportConfig(json)
+    local ok, data = pcall(function()
+        return HttpService:JSONDecode(json)
+    end)
+    if not ok then return false end
+
+    for k,v in pairs(data) do
+        if Config[k] ~= nil then
+            Config[k] = v
+        end
+    end
+
+    SaveConfig()
+    return true
+end
+
+local function ExportConfig()
+    local json = HttpService:JSONEncode(Config)
+    setclipboard(json)
+    return json
+end
+
 local function LoadConfig()
     if not readfile or not isfile or not isfile(CONFIG_FILE) then return end
     local ok, data = pcall(function()
