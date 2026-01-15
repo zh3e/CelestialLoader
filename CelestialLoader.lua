@@ -46,7 +46,13 @@ module:create_textbox({
         enteredKey = v
     end
 })
-
+module:create_dropdown({
+    title = "Preset",
+    options = {"Balanced", "Low Ping", "High Ping", "Aggressive"},
+    callback = function(v)
+        getgenv().BB_PRESET = v
+    end
+})
 module:create_button({
     title = "Verify & Load",
     callback = function()
