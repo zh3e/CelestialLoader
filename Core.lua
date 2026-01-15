@@ -1,4 +1,8 @@
 -- Celestial Core (Original)
+if getgenv().BB_PRESET then
+    ApplyPreset(getgenv().BB_PRESET)
+end
+
 local Config = {
     base_delay = 0.035,
     strength_scale = 0.07,
