@@ -1,4 +1,63 @@
--- Blade Ball Core (Original)
+-- Celestial Core (Original)
+local Config = {
+    base_delay = 0.035,
+    strength_scale = 0.07,
+    speed_scale = 1700,
+    ping_scale = 0.6,
+    dot_scale = 0.25,
+    parry_distance = 30
+}
+
+local HttpService = game:GetService("HttpService")
+local CONFIG_FILE = "bladeball_config.json"
+
+local function SaveConfig()
+    if not writefile then return end
+    writefile(CONFIG_FILE, HttpService:JSONEncode(Config))
+end
+
+local function LoadConfig()
+    if not readfile or not isfile or not isfile(CONFIG_FILE) then return end
+    local ok, data = pcall(function()
+        return HttpService:JSONDecode(readfile(CONFIG_FILE))
+    end)
+    if ok then
+        for k,v in pairs(data) do
+            Config[k] = v
+        end
+    end
+end
+
+LoadConfig()
+
+local Presets = {
+    ["Balanced"] = {
+        0.035, 0.07, 1700, 0.6, 0.25, 30
+    },
+    ["Low Ping"] = {
+        0.025, 0.05, 2000, 0.4, 0.2, 28
+    },
+    ["High Ping"] = {
+        0.05, 0.1, 1200, 1.0, 0.35, 38
+    },
+    ["Aggressive"] = {
+        0.03, 0.09, 1500, 0.55, 0.22, 34
+    }
+}
+
+local function ApplyPreset(name)
+    local p = Presets[name]
+    if not p then return end
+    Config.base_delay = p[1]
+    Config.strength_scale = p[2]
+    Config.speed_scale = p[3]
+    Config.ping_scale = p[4]
+    Config.dot_scale = p[5]
+    Config.parry_distance = p[6]
+end
+
+ApplyPreset("Balanced")
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
@@ -23,6 +82,42 @@ local function getBall()
         end
     end
 end
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local debugGui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
+debugGui.Name = "CurveDebug"
+
+local label = Instance.new("TextLabel", debugGui)
+label.Size = UDim2.new(0, 260, 0, 70)
+label.Position = UDim2.new(0, 15, 0, 300)
+label.BackgroundColor3 = Color3.fromRGB(20,20,25)
+label.TextColor3 = Color3.new(1,1,1)
+label.Font = Enum.Font.GothamBold
+label.TextSize = 14
+label.TextWrapped = true
+label.Text = "Curve Debug"
+Instance.new("UICorner", label).CornerRadius = UDim.new(0,10)
+
+local function UpdateDebug(strength, delay)
+    label.Text =
+        ("Curve Strength: %.2f\nDelay: %.3f"):format(strength, delay)
+end
+
+do
+    local expected = "Celestial Core"
+    if not tostring(script):find(expected) then
+        warn("Tamper detected.")
+        return
+    end
+
+    local mt = getrawmetatable(game)
+    if mt and not isreadonly(mt) then
+        warn("Metatable modified.")
+    end
+end
+
 
 local function updateCurve(ball)
     CurveHistory[ball] = CurveHistory[ball] or {}
