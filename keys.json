@@ -1,0 +1,10 @@
+{
+  "DEV-KEY-123": {
+    "expires": 1893456000,
+    "hwid": null
+  },
+  "TEST-KEY-456": {
+    "expires": 0,
+    "hwid": null
+  }
+}
