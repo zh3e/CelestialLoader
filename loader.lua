@@ -1,4 +1,4 @@
--- loader.lua (CelestialUI)
+-- loader.lua (CelestialUI - FIXED)
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
@@ -34,17 +34,36 @@ local function fetchScript(key)
     return game:HttpGet(url)
 end
 
--- ===== UI =====
-local Library = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/zh3e/CelestialUI/refs/heads/main/Source.lua"
-))()
+-- ===== LOAD UI LIBRARY SAFELY =====
+local Library
+do
+    local ok, lib = pcall(function()
+        return loadstring(game:HttpGet(
+            "https://raw.githubusercontent.com/zh3e/CelestialUI/refs/heads/main/Source.lua"
+        ))()
+    end)
 
+    if not ok or not lib then
+        warn("[Celestial Loader] Failed to load UI library")
+        return
+    end
+
+    Library = lib
+end
+
+-- ===== UI =====
 local ui = Library.new()
-local tab = ui:create_tab("Loader", "")
+
+-- ⚠️ ICON MUST NOT BE EMPTY
+local tab = ui:create_tab(
+    "Loader",
+    "rbxassetid://10723346959" -- valid icon ID (anything non-empty works)
+)
 
 local module = tab:create_module({
     title = "Celestial Loader",
-    description = "Enter your key to load",
+    description = "Enter your key to load the script",
+    section = "left",
     callback = function() end
 })
 
@@ -60,9 +79,8 @@ module:create_textbox({
 
 module:create_dropdown({
     title = "Preset",
-    options = {"Balanced", "Low Ping", "High Ping", "Aggressive"},
+    options = { "Balanced", "Low Ping", "High Ping", "Aggressive" },
     callback = function(v)
-        -- core.lua will read this
         getgenv().BB_PRESET = v
     end
 })
@@ -71,7 +89,7 @@ module:create_button({
     title = "Verify & Load",
     callback = function()
         if not enteredKey or enteredKey == "" then
-            warn("No key entered")
+            warn("[Celestial Loader] No key entered")
             return
         end
 
@@ -80,12 +98,12 @@ module:create_button({
         end)
 
         if not ok or not result then
-            warn("API error")
+            warn("[Celestial Loader] API error")
             return
         end
 
         if not result.valid then
-            warn("Key rejected:", result.reason or "unknown")
+            warn("[Celestial Loader] Key rejected:", result.reason or "unknown")
             return
         end
 
