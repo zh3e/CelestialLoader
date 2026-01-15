@@ -5,7 +5,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 -- ===== CONFIG =====
-local API_BASE = "http://YOUR_SERVER_IP:3000" -- same port as the bot
+local API_BASE = "https://loquacious-tyrell-ferociously.ngrok-free.dev"
 -- ==================
 
 -- HWID (stable & Roblox-safe)
